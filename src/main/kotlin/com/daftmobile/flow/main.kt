@@ -1,9 +1,7 @@
 package com.daftmobile.flow
 
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 
 fun createFlow() = flow {
@@ -15,6 +13,5 @@ fun createFlow() = flow {
 }
 fun main() =  runBlocking {
     createFlow()
-        .onEach { println(it) }
-        .collect() // ??
+        .collect { println(it) }
 }
