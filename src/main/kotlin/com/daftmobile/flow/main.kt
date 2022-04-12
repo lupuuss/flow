@@ -1,17 +1,23 @@
 package com.daftmobile.flow
 
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 
-fun createFlow() = flowOf(1, 2, 3, 4) // or listOf(1, 2, 3, 4).asFlow()
-
+fun createFlow() = flow {
+    emit(1)
+    delay(500)
+    emit(2)
+    delay(500)
+    throw IllegalStateException("Boom!")
+}
 fun main() = runBlocking {
-    createFlow()
-        .cancellable()
-        .collect {
-            if (it == 2) cancel()
+    val flow = createFlow()
+    try {
+        flow.collect {
             println(it)
         }
+    } catch (e: Exception) {
+        println("Caught: $e")
+    }
 }
