@@ -6,6 +6,8 @@ package com.daftmobile.flow
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 
 fun createFlow() = flow {
@@ -17,9 +19,12 @@ fun createFlow() = flow {
 }
 
 fun main() = runBlocking {
-    val disposable = createFlow().rxSubscribe { println(it) } // How to achieve Rx-like subscribe?
+    val job = createFlow()
+        .onEach(::println)
+        .launchIn(this)
+    // or val job = launch { createFlow().collect(::println) }
     println("Started...")
-    delay(20)
-    disposable.cancel()
+    delay(30)
+    job.cancel()
     println("Stopped")
 }
