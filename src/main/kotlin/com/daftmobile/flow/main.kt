@@ -4,9 +4,7 @@
 package com.daftmobile.flow
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.*
 
 fun createFlow() = flow {
     var i = 0
@@ -16,7 +14,8 @@ fun createFlow() = flow {
 
 fun main() = runBlocking {
     createFlow()
-        .flowOn(Dispatchers.Default) // Separate coroutines are created only if dispatcher is CHANGED
+        .flowOn(Dispatchers.Default)
+        .sample(10)
         .take(10)
         .collect {
             log("collect >> $it")
