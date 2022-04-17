@@ -4,7 +4,7 @@
 package com.daftmobile.flow
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
@@ -20,10 +20,10 @@ fun createFlow() = flow {
 fun main() = runBlocking {
     val time = measureTime {
         createFlow()
-            .conflate() // or .buffer(capacity = Channel.CONFLATED)
-            .collect {
-                log("Collect: $it")
+            .collectLatest {
+                log("Collecting: $it")
                 delay(300)
+                log("Collected: $it")
             }
     }
     println("Time: $time")
