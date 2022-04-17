@@ -14,11 +14,13 @@ fun createFlow() = flow {
 }
 
 fun main() = runBlocking {
-    createFlow()
-        .take(10)
-        .collect {
-            log("collect >> $it")
-        }
+    withContext(Dispatchers.Default) {
+        createFlow()
+            .take(10)
+            .collect {
+                log("collect >> $it")
+            }
+    }
     log("runBlocking body")
 }
 
