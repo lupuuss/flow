@@ -5,18 +5,18 @@ package com.daftmobile.flow
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.take
 
 fun createFlow() = flow {
-    withContext(Dispatchers.Default) {
-        var i = 0
-        log("flow body")
-        while (true) emit(i++)
-    }
+    var i = 0
+    log("flow body")
+    while (true) emit(i++)
 }
 
 fun main() = runBlocking {
     createFlow()
+        .flowOn(Dispatchers.Default) // Separate coroutines are created only if dispatcher is CHANGED
         .take(10)
         .collect {
             log("collect >> $it")
