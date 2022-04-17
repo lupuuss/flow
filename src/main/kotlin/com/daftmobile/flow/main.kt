@@ -1,23 +1,29 @@
-@file:OptIn(FlowPreview::class)
+@file:OptIn(FlowPreview::class, ExperimentalStdlibApi::class)
 @file:Suppress("unused")
 
 package com.daftmobile.flow
 
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.take
 
-fun createFlow() = flowOf(1, 2, 3, 4, 5)
+fun createFlow() = flow {
+    var i = 0
+    log("flow body")
+    while (true) emit(i++)
+}
 
 fun main() = runBlocking {
     createFlow()
-        .mapIndexed { index, item -> index + item }
-        .zipWithNext()
-        .onEach(::println)
-        .all { (a, b) -> a < b }
-        .let(::println)
+        .take(10)
+        .collect {
+            log("collect >> $it")
+        }
+    log("runBlocking body")
+}
 
-    println("Sum: ${createFlow().sum()}")
-    println("Average: ${createFlow().average()}")
+suspend fun log(msg: Any? = null) {
+    val context = currentCoroutineContext()
+    val msgText = msg?.let { ": $it" }.orEmpty()
+    println("${context.job} ${context[CoroutineDispatcher]}$msgText")
 }
