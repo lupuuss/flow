@@ -4,27 +4,20 @@
 package com.daftmobile.flow
 
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 
-fun createFlow() = flow {
-    var i = 0
-    while(true) {
-        delay(2)
-        emit(i++)
-    }
-}
+fun createFlow() = flowOf(1, 2, 3, 4, 5)
 
 fun main() = runBlocking {
-    val job = createFlow()
+    createFlow()
+        .mapIndexed { index, item -> index + item }
+        .zipWithNext()
         .onEach(::println)
-        .launchIn(this)
-    // or val job = launch { createFlow().collect(::println) }
-    println("Started...")
-    delay(30)
-    job.cancel()
-    println("Stopped")
+        .all { (a, b) -> a < b }
+        .let(::println)
+
+    println("Sum: ${createFlow().sum()}")
+    println("Average: ${createFlow().average()}")
 }
