@@ -8,19 +8,19 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.take
 
 fun createFlow() = flow {
-    var i = 0
-    log("flow body")
-    while (true) emit(i++)
+    withContext(Dispatchers.Default) {
+        var i = 0
+        log("flow body")
+        while (true) emit(i++)
+    }
 }
 
 fun main() = runBlocking {
-    withContext(Dispatchers.Default) {
-        createFlow()
-            .take(10)
-            .collect {
-                log("collect >> $it")
-            }
-    }
+    createFlow()
+        .take(10)
+        .collect {
+            log("collect >> $it")
+        }
     log("runBlocking body")
 }
 
