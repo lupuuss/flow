@@ -4,14 +4,15 @@
 package com.daftmobile.flow
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 fun createFlow() = flow {
     for (i in 1..10) {
-        emit(i)
         log("Emit: $i")
+        emit(i)
         delay(100)
     }
 }
@@ -19,6 +20,7 @@ fun createFlow() = flow {
 fun main() = runBlocking {
     val time = measureTime {
         createFlow()
+            .buffer(capacity = 10, onBufferOverflow = BufferOverflow.SUSPEND)
             .collect {
                 log("Collect: $it")
                 delay(300)
