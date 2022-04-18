@@ -8,28 +8,17 @@ import kotlinx.coroutines.flow.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-fun createFlow() = flow { for (i in 1..10) emit(i) }
-
 fun divisorsOf(number: Int): Flow<Int> = flow {
-    log("Divisors of $number:")
-    delay(100)
+    log("Divisors of $number flow!")
     emit(1)
-    for (i in 2..(number / 2)) {
-        if (number % i == 0) {
-            delay(20)
-            emit(i)
-        }
-    }
+    for (i in 2..(number / 2)) if (number % i == 0) emit(i)
     if (number != 1) emit(number)
 }
 
 fun main() = runBlocking {
-    val time = measureTime {
-        createFlow()
-            .flatMapLatest(::divisorsOf)
-            .collect(::println)
-    }
-    println("Time: $time")
+    val divisors = List(10) { divisorsOf(it + 1) }
+    combine(flows = divisors, transform = Array<*>::contentToString)
+        .collect(::println)
 }
 
 suspend fun log(msg: Any? = null) {
