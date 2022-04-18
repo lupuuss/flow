@@ -6,7 +6,6 @@ package com.daftmobile.flow
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
 fun divisorsOf(number: Int): Flow<Int> = flow {
     log("Divisors of $number flow!")
@@ -18,6 +17,7 @@ fun divisorsOf(number: Int): Flow<Int> = flow {
 fun main() = runBlocking {
     val divisors = List(10) { divisorsOf(it + 1) }
     combine(flows = divisors, transform = Array<*>::contentToString)
+        .flowOn(Dispatchers.Default)
         .collect(::println)
 }
 
