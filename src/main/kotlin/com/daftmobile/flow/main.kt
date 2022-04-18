@@ -25,8 +25,8 @@ fun divisorsOf(number: Int): Flow<Int> = flow {
 fun main() = runBlocking {
     val time = measureTime {
         createFlow()
-            .map(::divisorsOf)   // or just .flatMapConcat(::divisorsOf)
-            .flattenConcat()
+            .map(::divisorsOf)   // or just .flatMapMerge(transform = ::divisorsOf)
+            .flattenMerge()      // consider adjusting concurrency parameter
             .collect(::println)
     }
     println("Time: $time")
