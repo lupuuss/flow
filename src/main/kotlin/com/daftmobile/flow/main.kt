@@ -4,54 +4,50 @@
 package com.daftmobile.flow
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlin.time.ExperimentalTime
 
-fun main() = runBlocking {
-    val sharedFlow = MutableSharedFlow<Int>(
-        replay = 0,
-        extraBufferCapacity = 0,
-        onBufferOverflow = BufferOverflow.SUSPEND
-    ) // Change parameters to achieve different behaviours!
-
-    sharedFlow.subscriptionCount
-        .onEach { println("Subscribers: $it") }
-        .launchIn(this)
-
-    sharedFlow.simulateSubscriberIn("Alpha", this)
-    sharedFlow.simulateSubscriberIn("Beta ", this)
-
-    delay(100)
-
-    println("Start emission!")
-
-    for (i in 1..3) {
-        println("# emit start  $i")
-        sharedFlow.emit(i)
-        println("# emit done   $i")
+fun ticker(interval: Long): Flow<Long> = flow {
+    var i = 0L
+    while(true) {
+        emit(i++)
+        delay(interval)
     }
+}
 
-    delay(500)
+fun timer(interval: Long): Flow<Long> {
+    val startTime = System.currentTimeMillis()
+    return flow {
+        while (true) {
+            emit(System.currentTimeMillis() - startTime)
+            delay(interval)
+        }
+    }
+}
 
-    sharedFlow.simulateSubscriberIn("Gamma", this)
+fun main() = runBlocking {
+    val flow = ticker(200)
+        .onEach { println("Emit: $it") }
+        .shareIn(this, started = SharingStarted.Eagerly, replay = 0)
 
-    delay(500)
+    println("Creating flow...")
 
-    sharedFlow.resetReplayCache()
-    sharedFlow.simulateSubscriberIn("Delta", this)
+    delay(300)
 
-    delay(500)
+    withTimeoutOrNull(300) { flow.simulateSubscriberIn("Alpha", this) }
+
+    delay(300)
+
+    withTimeoutOrNull(300) { flow.simulateSubscriberIn("Beta", this) }
+
+    delay(300)
+
     cancel()
 }
 
 fun <T> SharedFlow<T>.simulateSubscriberIn(tag: String, scope: CoroutineScope): Job {
-    return onEach {
-        println("$tag collect start  $it")
-        delay(100)
-        println("$tag collect done   $it")
-    }.launchIn(scope)
+    return onEach { println("$tag collect $it") }
+        .onStart { println("$tag subscription start") }
+        .onCompletion { println("$tag subscription end") }
+        .launchIn(scope)
 }
