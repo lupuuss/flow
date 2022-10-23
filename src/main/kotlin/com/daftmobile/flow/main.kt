@@ -15,7 +15,7 @@ fun main() {
     val time = measureTime {
         runBlocking {
             val numbers = Channel<BigInteger>()
-            nextPrimeGenerator(numbers)
+            repeat(4) { nextPrimeGenerator(numbers, tag = "#$it") }
             for (i in 1..10) numbers.send(randomBigInteger(2048))
             numbers.close()
         }

@@ -13,12 +13,13 @@ import kotlin.time.measureTime
 fun CoroutineScope.nextPrimeGenerator(
     numbers: ReceiveChannel<BigInteger>,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    tag: String = "",
 ) = launch(dispatcher) {
     for (number in numbers) { // or numbers.consumeEach
         val nextPrime: BigInteger
         val time = measureTime {
             nextPrime = number.nextProbablePrime()
         }
-        println("NextPrimeGenerator: time: $time -> $nextPrime")
+        println("NextPrimeGenerator$tag: time: $time -> $nextPrime")
     }
 }
