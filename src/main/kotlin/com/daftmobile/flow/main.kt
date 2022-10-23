@@ -3,8 +3,6 @@
 
 package com.daftmobile.flow
 
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import java.math.BigInteger
 import kotlin.random.Random
@@ -15,12 +13,8 @@ import kotlin.time.measureTime
 fun main() {
     val time = measureTime {
         runBlocking {
-            val numbers = Channel<BigInteger>()
+            val numbers = primeGenerator(2048, 5, 2)
             repeat(4) { nextPrimeGenerator(numbers, tag = "#$it") }
-            coroutineScope {
-                repeat(5) { primeGenerator(numbers, 2048, 2) }
-            }
-            numbers.close()
         }
     }
     println("Time: $time")
