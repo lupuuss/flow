@@ -5,9 +5,18 @@ package com.daftmobile.flow
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
+fun createFlow() = flow {
+    withContext(Dispatchers.Default) {
+        var i = 0
+        while (true) {
+            delay(500)
+            emit(i++)
+        }
+    }
+}
+
 fun main() = runBlocking {
-    LightSensor
-        .consumeAsFlow()
-        .take(10)
+    createFlow()
+        .take(6)
         .collect { println(it) }
 }
