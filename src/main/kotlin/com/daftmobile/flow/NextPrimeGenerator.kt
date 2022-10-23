@@ -14,9 +14,8 @@ fun CoroutineScope.nextPrimeGenerator(
     numbers: ReceiveChannel<BigInteger>,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) = launch(dispatcher) {
-    while (true) {
+    for (number in numbers) { // or numbers.consumeEach
         val nextPrime: BigInteger
-        val number = numbers.receive()
         val time = measureTime {
             nextPrime = number.nextProbablePrime()
         }
