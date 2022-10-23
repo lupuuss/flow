@@ -2,21 +2,12 @@
 
 package com.daftmobile.flow
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-fun createFlow() = channelFlow {
-    withContext(Dispatchers.Default) {
-        var i = 0
-        while (true) {
-            delay(500)
-            send(i++)
-        }
-    }
-}
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 fun main() = runBlocking {
-    createFlow()
-        .take(6)
-        .collect { println(it) }
+    val channel = Channel<String>()
+    launch { channel.send("Hello channel!") }
+    println(channel.receive())
 }
