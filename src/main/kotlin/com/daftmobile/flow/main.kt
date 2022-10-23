@@ -3,23 +3,33 @@
 
 package com.daftmobile.flow
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.math.BigInteger
-import kotlin.random.Random
-import kotlin.random.asJavaRandom
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 fun main() {
     val time = measureTime {
         runBlocking {
-            val numbers = primeGenerator(2048, 5, 2)
-            repeat(4) { nextPrimeGenerator(numbers, tag = "#$it") }
+            val numbers = List(5) { primeGenerator(2048, 2) }.mergeIn(this)
+            List(5) { nextPrimeGenerator(numbers) }
+                .mergeIn(this)
+                .consumeEach(::println)
         }
     }
     println("Time: $time")
 }
 
-fun randomBigInteger(bits: Int): BigInteger = generateSequence { BigInteger(bits, Random.asJavaRandom()) }
-    .filter { it > BigInteger.ONE }
-    .first()
+fun <T> List<ReceiveChannel<T>>.mergeIn(scope: CoroutineScope): ReceiveChannel<T> = scope.produce {
+    for (channel in this@mergeIn) {
+        launch {
+            for (element in channel) {
+                send(element)
+            }
+        }
+    }
+}
