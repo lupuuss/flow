@@ -4,6 +4,7 @@
 package com.daftmobile.flow
 
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import java.math.BigInteger
 import kotlin.random.Random
@@ -16,7 +17,9 @@ fun main() {
         runBlocking {
             val numbers = Channel<BigInteger>()
             repeat(4) { nextPrimeGenerator(numbers, tag = "#$it") }
-            for (i in 1..10) numbers.send(randomBigInteger(2048))
+            coroutineScope {
+                repeat(5) { primeGenerator(numbers, 2048, 2) }
+            }
             numbers.close()
         }
     }
