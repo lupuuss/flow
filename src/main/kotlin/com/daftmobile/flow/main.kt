@@ -5,12 +5,12 @@ package com.daftmobile.flow
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-fun createFlow() = flow {
+fun createFlow() = channelFlow {
     withContext(Dispatchers.Default) {
         var i = 0
         while (true) {
             delay(500)
-            emit(i++)
+            send(i++)
         }
     }
 }
